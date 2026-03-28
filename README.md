@@ -27,6 +27,32 @@ cd auto-cdc
 pip install -e ".[dev]"
 ```
 
+## Docker
+
+Build the project image:
+
+```bash
+docker build -t auto-cdc .
+```
+
+Run an interactive shell inside the container:
+
+```bash
+docker run --rm -it -v "$PWD":/app -w /app auto-cdc bash
+```
+
+Using Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Run the CSV ingestion example via Docker Compose:
+
+```bash
+docker compose run --rm app python examples/data_feed.py /path/to/data.csv /Volumes/catalog.schema/table --keys id
+```
+
 ## Quick Start
 
 ### Basic Usage
