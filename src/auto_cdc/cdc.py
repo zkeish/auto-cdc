@@ -6,14 +6,14 @@ import warnings
 from auto_cdc import AppFunctions, Utils
 from pyspark.sql.dataframe import DataFrame
 
-
 class CDC:
 
     @staticmethod
     def write_to_cdc_feed(spark_dataframe: DataFrame, folder_path: str, keys: list, source_timestamp: datetime, exclude_columns_from_tracking: list | None=None, vacuum_days: int=7, recurse: bool=True, batch_size: int=10, lexical_prefix: bool=False) -> None:
         spark = AppFunctions.get_spark()
         spark.conf.set('spark.sql.caseSensitive', False)
-        spark.conf.set('spark.databricks.delta.properties.defaults.enableChangeDataFeed', True)
+        if 'DATABRICKS_RUNTIME_VERSION' in os.environ:
+            spark.conf.set('spark.databricks.delta.properties.defaults.enableChangeDataFeed', True)
         overwrite = False
         
         if isinstance(source_timestamp, date) and not isinstance(source_timestamp, datetime):
@@ -24,7 +24,7 @@ class CDC:
         if spark_dataframe.isEmpty():
             cdc_utils.handle_empty_dataframe()
         elif not spark.catalog.tableExists(cdc_utils.target_table_name):
-            overwrite = cdc_utils.overwrite_data()
+            overwrite = cdc_utils.overwrite_data(vacuum_days=vacuum_days)
             cdc_utils.final_cdc_push(batch_size, overwrite, lexical_prefix=lexical_prefix)
         else:
             versions_df = cdc_utils.get_cdc_versions(datetime(1900, 1, 1, 0, 0, 0))
@@ -39,7 +39,7 @@ class CDC:
                     except Exception as e:
                         print('Overwriting data...')
                         warnings.warn(f"Warning: {e} occurred!")
-                        overwrite = cdc_utils.overwrite_data()
+                        overwrite = cdc_utils.overwrite_data(vacuum_days=vacuum_days)
 
                 else:
                     condition = cdc_utils.create_condition()
@@ -48,7 +48,7 @@ class CDC:
                     except Exception as e:
                         print('Overwriting data...')
                         warnings.warn(f"Warning: {e} occurred!")
-                        overwrite = cdc_utils.overwrite_data()
+                        overwrite = cdc_utils.overwrite_data(vacuum_days=vacuum_days)
                 cdc_utils.final_cdc_push(batch_size, overwrite, lexical_prefix=lexical_prefix)
     
     @staticmethod
@@ -250,8 +250,13 @@ class HelperFunctions:
             .whenNotMatchedBySourceDelete() \
             .execute()
 
-    def overwrite_data(self) -> bool:
-        self.spark_dataframe.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(self.target_table_name)
+    def overwrite_data(self, vacuum_days: int=7) -> bool:
+        self.spark_dataframe.write.format("delta") \
+            .mode("overwrite") \
+            .option("overwriteSchema", "true") \
+            .option("delta.enableChangeDataFeed", "true") \
+            .option("delta.deletedFileRetentionDuration", f"interval {vacuum_days} days") \
+            .saveAsTable(self.target_table_name)
         return True
         
     def rewrite_cdc_feed(self) -> None:
