@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, date, timedelta
 import glob
-from typing import Any
 import warnings
 from auto_cdc import AppFunctions, Utils
 from pyspark.sql.dataframe import DataFrame
