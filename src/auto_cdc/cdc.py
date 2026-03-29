@@ -2,7 +2,7 @@ import os
 from datetime import datetime, date, timedelta
 import glob
 import warnings
-from auto_cdc import AppFunctions, Utils
+from utils import AppFunctions, Utils
 from pyspark.sql.dataframe import DataFrame
 
 class CDC:

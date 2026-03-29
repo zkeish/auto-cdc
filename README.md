@@ -1,17 +1,17 @@
 # auto-cdc
 
-**Automated Change Data Capture (CDC) framework for Databricks Delta Lake**
+**Lightweight Python helper for Change Data Capture on Delta Lake**
 
-A Python package that simplifies implementing Change Data Capture patterns on Databricks Delta Lake, enabling efficient tracking and management of data changes.
+`auto-cdc` provides helper methods for writing CDC feeds to Delta Lake tables using PySpark. It manages schema evolution, merge-based upserts, helper metadata tables, and retention-aware vacuuming, with optional Databricks Change Data Feed support when running in Databricks.
 
 ## Features
 
-- **Automated CDC Management**: Seamlessly write change data to Delta tables with built-in change tracking
-- **Schema Evolution**: Automatically handle schema changes between source and target tables
-- **Version Management**: Track and manage multiple CDC versions with timestamp-based versioning
-- **Data Cleanup**: Built-in vacuum and retention policies for managing table history
-- **Merge Operations**: Configurable merge logic with support for custom change detection
-- **Change Feed Integration**: Native integration with Delta Change Data Feed for efficient CDC consumption
+- **CDC writes to Delta Lake**: Write Spark DataFrames into Delta-based CDC feeds
+- **Schema evolution handling**: Detects schema changes and updates the target table as needed
+- **Merge-based upserts**: Updates existing rows and inserts new rows using configurable key matching
+- **Version tracking**: Stores CDC version and source timestamp history in helper tables
+- **Retention cleanup**: Supports vacuuming old Delta versions based on configured retention days
+- **Databricks-aware**: Enables Delta Change Data Feed when running inside Databricks
 
 ## Installation
 
