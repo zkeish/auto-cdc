@@ -2,7 +2,7 @@
 
 **Lightweight Python helper for Change Data Capture on Delta Lake**
 
-`auto-cdc` provides helper methods for writing CDC feeds to Delta Lake tables using PySpark. It manages schema evolution, merge-based upserts, helper metadata tables, and retention-aware vacuuming, with optional Databricks Change Data Feed support when running in Databricks.
+`auto-cdc` helps teams build and maintain Delta Lake change data capture workflows from PySpark. It turns Spark DataFrames into managed CDC feeds by automating table creation, schema evolution, merge-based upserts, version tracking, and retention cleanup. The package is designed to reduce the boilerplate needed for incremental CDC writes and make Delta Lake CDC easier to operate.
 
 ## Features
 
@@ -25,32 +25,6 @@ pip install auto-cdc
 git clone https://github.com/yourusername/auto-cdc.git
 cd auto-cdc
 pip install -e ".[dev]"
-```
-
-## Docker
-
-Build the project image:
-
-```bash
-docker build -t auto-cdc .
-```
-
-Run an interactive shell inside the container:
-
-```bash
-docker run --rm -it -v "$PWD":/app -w /app auto-cdc bash
-```
-
-Using Docker Compose:
-
-```bash
-docker compose up --build
-```
-
-Run the CSV ingestion example via Docker Compose:
-
-```bash
-docker compose run --rm app python examples/data_feed.py /path/to/data.csv /Volumes/catalog.schema/table --keys id
 ```
 
 ## Quick Start
@@ -173,25 +147,6 @@ ruff check src/
 # Type checking
 mypy src/
 ```
-
-## Project Structure
-
-```
-auto-cdc/
-├── src/auto_cdc/          # Main package
-│   ├── __init__.py        # Package initialization
-│   ├── cdc.py             # Core CDC classes
-│   ├── utils.py           # Utility functions
-│   └── exceptions.py      # Custom exceptions
-├── tests/                 # Test suite
-│   ├── conftest.py        # Pytest configuration
-│   └── test_cdc.py        # CDC tests
-├── docs/                  # Documentation
-├── pyproject.toml         # Project configuration
-├── README.md              # This file
-└── .gitignore             # Git ignore rules
-```
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -211,3 +166,6 @@ For issues, questions, or suggestions, please open an issue on [GitHub Issues](h
 - Support for Delta Lake Change Data Feed
 - Automated schema evolution
 - Version management and tracking
+
+### Version 0.1.3 (Stability)
+- Changing internal references
