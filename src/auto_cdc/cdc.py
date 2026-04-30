@@ -11,8 +11,9 @@ class CDC:
     def write_to_cdc_feed(spark_dataframe: DataFrame, folder_path: str, keys: list, source_timestamp: datetime, exclude_columns_from_tracking: list | None=None, vacuum_days: int=7, recurse: bool=True, batch_size: int=10, lexical_prefix: bool=False) -> None:
         spark = AppFunctions.get_spark()
         spark.conf.set('spark.sql.caseSensitive', False)
-        if 'DATABRICKS_RUNTIME_VERSION' in os.environ:
-            spark.conf.set('spark.databricks.delta.properties.defaults.enableChangeDataFeed', True)
+        spark.conf.set('spark.databricks.delta.properties.defaults.enableChangeDataFeed', True)
+        spark.conf.set("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        spark.conf.set("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
         overwrite = False
         
         if isinstance(source_timestamp, date) and not isinstance(source_timestamp, datetime):
